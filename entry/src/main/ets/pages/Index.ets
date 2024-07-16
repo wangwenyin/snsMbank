@@ -1,18 +1,15 @@
 // import fancyText from '../../commonStyle/extend'
+import {
+  getPrdInfo
+} from '../../api/index'
+import {
+  Icon,
+  Product
+} from '../../interface/index'
 @Extend(Text) function fancyText(color: string = '#999', size: number = 12, weightValue: number = FontWeight.Normal) {
   .fontColor(color)
   .fontSize(size)
   .fontWeight(weightValue)
-}
-
-interface Icon {
-  icon: ResourceStr,
-  text: string,
-  url: string
-}
-
-interface Indicator {
-  dot: Function
 }
 
 @Entry
@@ -32,7 +29,7 @@ struct Index {
     { icon: $r('app.media.icon9'), text: '预约取号', url: '' },
     { icon: $r('app.media.icon10'), text: '全部功能', url: '' }
   ]
-
+  @State hotPrd: Product = null
   @Builder tabBuilder(title: string, targetIndex: number, selectedImg: Resource, normalImg: Resource) {
     Column() {
       Image(this.currentIndex === targetIndex ? selectedImg : normalImg)
@@ -56,8 +53,10 @@ struct Index {
     })
   }
 
-  aboutToAppear(): void {
-
+  async aboutToAppear() {
+    console.log('进入页面了？')
+    const res: any  = await getPrdInfo()
+    this.hotPrd = res.find(item => item.hot)
   }
   build() {
     Row() {
@@ -317,13 +316,13 @@ struct Index {
                 Column({ space: 15 }){
                   Row(){
                     Image($r('app.media.syd2')).width(20)
-                    Text('速易贷').fancyText('#333', 20, 600)
+                    Text(this.hotPrd?.prd).fancyText('#333', 20, 600)
                       .margin({ left: 8, right: 12 })
                     Text('年利率(单利)低至').fancyText('#333', 14)
-                    Text('9.6%').fancyText('#F23C3C', 14)
+                    Text(`${ this.hotPrd?.rate }%`).fancyText('#F23C3C', 14)
                       .margin({ left: 3 })
                   }
-                  Text('¥3,000,000.00').fancyText('#F23C3C', 28, FontWeight.Bold)
+                  Text(this.hotPrd?.maxAmount).fancyText('#F23C3C', 28, FontWeight.Bold)
                   Text('最高可申请').fancyText('#333', 14)
                   Button('立即申请')
                     .width(80)
